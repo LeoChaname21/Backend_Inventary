@@ -19,7 +19,7 @@ public class Jasypt{
         encrypt=new AES256TextEncryptor();
         encrypt.setPassword(key);
     }
-
+/*
     public String encrypting(String password){
         try {
             return encrypt.encrypt(password);
@@ -28,6 +28,10 @@ public class Jasypt{
             return AlmacenConstants.ALGO_SALIO_MAL;
         }
     }
+
+ */
+
+    /*
 
     public String decrypting(Blob password){
         try {
@@ -39,6 +43,27 @@ public class Jasypt{
         }
     }
 
+     */
+
+    public String encrypting(String password) {
+        try {
+            return encrypt.encrypt(password);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return AlmacenConstants.ALGO_SALIO_MAL;
+        }
+    }
+
+    public String decrypting(String passwordEncrypted) {
+        try {
+            return encrypt.decrypt(passwordEncrypted);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return AlmacenConstants.ALGO_SALIO_MAL;
+        }
+    }
+
+    /*
     private String convertBlobToString(Blob blob) {
         StringBuilder sb = new StringBuilder();
         try (InputStream inputStream = blob.getBinaryStream();
@@ -52,4 +77,6 @@ public class Jasypt{
         }
         return sb.toString();
     }
+
+     */
 }

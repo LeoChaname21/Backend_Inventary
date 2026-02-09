@@ -167,6 +167,7 @@ public class UserServiceImpl implements UserService {
         return AlmacenUtils.getResponseEntity("true", HttpStatus.OK);
     }
 
+    /*
     @Override
     public ResponseEntity<String> cambiarContrasena(Map<String, String> requestMap) {
         try {
@@ -188,6 +189,51 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+     */
+
+    @Override
+    public ResponseEntity<String> cambiarContrasena(Map<String, String> requestMap) {
+        try {
+            User u = userDao.findByEmail(jwtFilter.getCurrentUser());
+
+            if (u != null) {
+
+                String oldPassword = requestMap.get("oldPassword");
+                String newPassword = requestMap.get("newPassword");
+
+                if (jasypt.decrypting(u.getContrasena()).equals(oldPassword)) {
+
+                    String encryptedPassword = jasypt.encrypting(newPassword);
+                    u.setContrasena(encryptedPassword);
+                    userDao.save(u);
+
+                    return AlmacenUtils.getResponseEntity(
+                            "Contraseña actualizada correctamente.",
+                            HttpStatus.OK
+                    );
+                }
+
+                return AlmacenUtils.getResponseEntity(
+                        "Contraseña o correo incorrecto.",
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+
+            return AlmacenUtils.getResponseEntity(
+                    AlmacenConstants.ALGO_SALIO_MAL,
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return AlmacenUtils.getResponseEntity(
+                AlmacenConstants.ALGO_SALIO_MAL,
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 
     public Boolean validateStatus(User myUser, User userUpd){
@@ -352,6 +398,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /*
     private User getUserFromMap(Map<String,String> requestMap, boolean esAdd) {
         String password;
         User user= new User();
@@ -369,6 +416,38 @@ public class UserServiceImpl implements UserService {
         }catch (Exception e){
             e.printStackTrace();
         }
+        return user;
+    }
+
+     */
+
+    private User getUserFromMap(Map<String, String> requestMap, boolean esAdd) {
+
+        User user = new User();
+
+        if (esAdd) {
+            user.setId(Integer.parseInt(requestMap.get("id")));
+        }
+
+        user.setNombre(requestMap.get("nombre"));
+        user.setEmail(requestMap.get("email"));
+
+        user.setRol(requestMap.containsKey("rol")
+                ? requestMap.get("rol")
+                : "user");
+
+        user.setEstado(requestMap.containsKey("estado")
+                ? Boolean.parseBoolean(requestMap.get("estado"))
+                : false);
+
+        try {
+            String password = requestMap.get("contrasena");
+            String encryptedPassword = jasypt.encrypting(password);
+            user.setContrasena(encryptedPassword);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return user;
     }
 }

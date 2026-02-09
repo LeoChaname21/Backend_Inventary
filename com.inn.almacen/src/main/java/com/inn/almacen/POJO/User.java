@@ -22,7 +22,7 @@ import java.io.Serializable;
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@Table(name="user")
+@Table(name="users")
 public class User implements Serializable {
 
     private static final long serialVersionUID=1L;
@@ -38,7 +38,7 @@ public class User implements Serializable {
     private String email;
 
     @Column(name="contrasena")
-    private Blob contrasena;
+    private String contrasena;
 
     @Column(name="estado")
     private Boolean estado;
